@@ -4,7 +4,7 @@ Marketing site for Apache Junction Epoxy. Plain HTML, CSS and JavaScript in `pub
 
 ## Deploying on Cloudflare
 Workers & Pages → Create → Import a repository → pick this repo.
-- Project / Worker name: `apachejunctionepoxy-com` (must match `name` in `wrangler.jsonc`)
+- Project / Worker name: `apachejunctionepoxy` (must match `name` in `wrangler.jsonc`)
 - Build command: leave empty
 - Deploy command: `npx wrangler deploy`
 
