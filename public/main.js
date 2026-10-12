@@ -303,12 +303,50 @@
     });
   }
 
+
+  /* ------------------------------------------------------------------
+   * Service pages: hero finish pulled across on load, related thumbnails,
+   * and "On this page" highlighting
+   * ------------------------------------------------------------------ */
+  const pageHero = document.querySelector("canvas[data-hero]");
+  if (pageHero) {
+    const fin = pageHero.dataset.finish;
+    if (fin === "metallic") { if (!startPour(pageHero)) paint(pageHero, fin); }
+    else paint(pageHero, fin);
+    requestAnimationFrame(() => requestAnimationFrame(() => pageHero.classList.add("in")));
+    if (fin !== "metallic") {
+      let ht;
+      window.addEventListener("resize", () => { clearTimeout(ht); ht = setTimeout(() => paint(pageHero, fin), 200); });
+    }
+  }
+
+  const thumbs = Array.from(document.querySelectorAll("canvas[data-finish]:not([data-hero])"));
+  if (thumbs.length) {
+    const draw = (c) => { if (!c.dataset.painted) { paint(c, c.dataset.finish); c.dataset.painted = "1"; } };
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((ents) => ents.forEach((en) => { if (en.isIntersecting) { draw(en.target); io.unobserve(en.target); } }), { rootMargin: "300px" });
+      thumbs.forEach((c) => io.observe(c));
+    } else thumbs.forEach(draw);
+  }
+
+  const tocLinks = Array.from(document.querySelectorAll(".toc a"));
+  if (tocLinks.length && "IntersectionObserver" in window) {
+    const targets = tocLinks.map((a) => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean);
+    const seen = new Set();
+    const spy = new IntersectionObserver((ents) => {
+      ents.forEach((en) => { en.isIntersecting ? seen.add(en.target.id) : seen.delete(en.target.id); });
+      const firstVisible = targets.find((t) => seen.has(t.id));
+      if (firstVisible) tocLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + firstVisible.id));
+    }, { rootMargin: "-90px 0px -55% 0px" });
+    targets.forEach((t) => spy.observe(t));
+  }
+
   /* ------------------------------------------------------------------
    * Header, mobile menu, call bar
    * ------------------------------------------------------------------ */
   const header = document.querySelector(".site-header");
   const callBar = document.querySelector(".call-bar");
-  const hero = document.querySelector(".hero");
+  const hero = document.querySelector(".hero, .page-hero");
   function onScroll() {
     const past = window.scrollY > (hero ? hero.offsetHeight - 80 : 40);
     header.classList.toggle("scrolled", past);
@@ -329,6 +367,23 @@
     list.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
   }
+
+
+  /* Services dropdown: click/tap or keyboard; hover handled in CSS on desktop */
+  document.querySelectorAll(".has-sub").forEach((item) => {
+    const btn = item.querySelector(".sub-toggle");
+    const setSub = (open) => { item.classList.toggle("open", open); btn.setAttribute("aria-expanded", String(open)); };
+    btn.addEventListener("click", (e) => { e.stopPropagation(); setSub(!item.classList.contains("open")); });
+    item.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && item.classList.contains("open")) { e.stopPropagation(); setSub(false); btn.focus(); }
+    });
+    item.addEventListener("focusout", (e) => {
+      if (window.matchMedia("(min-width: 761px)").matches && !item.contains(e.relatedTarget)) setSub(false);
+    });
+    document.addEventListener("click", (e) => {
+      if (!item.contains(e.target) && window.matchMedia("(min-width: 761px)").matches) setSub(false);
+    });
+  });
 
   /* ------------------------------------------------------------------
    * Estimate form. No backend yet: it opens the visitor's email app
