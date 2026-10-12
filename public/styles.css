@@ -488,3 +488,9 @@ body.lb-lock { overflow: hidden; }
   .g-item { border-radius: 12px; }
   .lb-prev, .lb-next { top: auto; bottom: 16px; transform: none; }
 }
+
+/* Estimate form: spam trap + states */
+.hp { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.estimate-form { position: relative; }
+.form-status.success { color: #1b7f4b; }
+.btn[disabled] { opacity: .7; cursor: progress; }

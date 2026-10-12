@@ -1,8 +1,16 @@
 {
   "name": "apachejunctionepoxy",
+  "main": "src/worker.js",
   "compatibility_date": "2026-10-01",
   "assets": {
     "directory": "./public",
-    "not_found_handling": "404-page"
-  }
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // Only the form endpoint runs code; every other request is served straight from ./public.
+    "run_worker_first": ["/api/*"]
+  },
+  // RESEND_API_KEY (secret), LEADS_TO_EMAIL and LEADS_FROM_EMAIL are set in the Cloudflare dashboard.
+  // keep_vars stops a deploy from wiping them.
+  "keep_vars": true,
+  "observability": { "enabled": true }
 }

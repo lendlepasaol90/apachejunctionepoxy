@@ -386,32 +386,54 @@
   });
 
   /* ------------------------------------------------------------------
-   * Estimate form. No backend yet: it opens the visitor's email app
-   * with the details filled in. Swap for a real endpoint later.
+   * Estimate form: posts to /api/estimate (Cloudflare Worker -> Resend)
    * ------------------------------------------------------------------ */
   const form = document.getElementById("estimate-form");
   const status = document.getElementById("form-status");
   if (form) {
-    form.addEventListener("submit", (e) => {
+    const btn = form.querySelector('button[type="submit"]');
+    const btnLabel = btn ? btn.textContent : "";
+    const say = (msg, isError) => { status.className = "form-status" + (isError ? " error" : " success"); status.textContent = msg; };
+
+    // Result of a no-JavaScript submission (the Worker redirects back here)
+    const q = new URLSearchParams(location.search).get("estimate");
+    if (q === "sent") say("Thanks. We got your request and will call you within one business day.", false);
+    else if (q === "error") say("We couldn't send your request. Call (480) 555-0142 or try again.", true);
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = form.elements.name, phone = form.elements.phone;
+      const name = form.elements.name, phone = form.elements.phone, email = form.elements.email;
       let bad = null;
       [name, phone].forEach((f) => {
         const empty = !f.value.trim();
         f.setAttribute("aria-invalid", String(empty));
         if (empty && !bad) bad = f;
       });
-      if (bad) {
-        status.className = "form-status error";
-        status.textContent = "Add your name and phone number so we can reach you.";
-        bad.focus();
-        return;
+      if (bad) { say("Add your name and phone number so we can reach you.", true); bad.focus(); return; }
+      if (email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+        email.setAttribute("aria-invalid", "true"); say("Check the email address, or leave it blank.", true); email.focus(); return;
       }
-      const v = (n) => (form.elements[n].value || "").trim();
-      const body = `Name: ${v("name")}\nPhone: ${v("phone")}\nEmail: ${v("email")}\nService: ${v("service")}\nCity: ${v("city")}\n\n${v("message")}`;
-      window.location.href = `mailto:hello@apachejunctionepoxy.com?subject=${encodeURIComponent("Estimate request: " + v("service"))}&body=${encodeURIComponent(body)}`;
-      status.className = "form-status";
-      status.textContent = "Your email app should open with your request filled in. Send it and we'll be in touch within one business day.";
+      email.setAttribute("aria-invalid", "false");
+
+      const data = Object.fromEntries(new FormData(form));
+      data.page = location.pathname;
+      btn.disabled = true; btn.textContent = "Sending…"; say("", false);
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(data),
+        });
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || !out.ok) throw new Error(out.error || "");
+        const first = data.name.trim().split(/\s+/)[0];
+        form.reset();
+        say(`Thanks, ${first}. We got your request and will call you within one business day.`, false);
+      } catch (err) {
+        say((err && err.message) || "We couldn't send your request. Call (480) 555-0142 or try again.", true);
+      } finally {
+        btn.disabled = false; btn.textContent = btnLabel;
+      }
     });
   }
 

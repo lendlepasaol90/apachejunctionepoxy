@@ -13,4 +13,4 @@ Every push to `main` redeploys automatically.
 ## Placeholders to replace
 - Phone `(480) 555-0142` and email `hello@apachejunctionepoxy.com` (search `public/` for both)
 - Logo files live in `public/images/` (logo.webp for light backgrounds, logo-light.webp for dark ones, icon-*.png for browser tabs)
-- The estimate form currently opens the visitor's email app; connect it to a form service or a Worker to receive submissions directly.
+- Estimate form: posts to `/api/estimate` (src/worker.js), which emails each request through Resend. Set RESEND_API_KEY (secret), LEADS_TO_EMAIL and optionally LEADS_FROM_EMAIL under the Worker's Settings → Variables and Secrets in Cloudflare.

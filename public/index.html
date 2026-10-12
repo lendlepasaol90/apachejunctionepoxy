@@ -252,7 +252,8 @@
             <li>Mon–Sat, 7am–6pm</li>
           </ul>
         </div>
-        <form class="estimate-form" id="estimate-form" novalidate>
+        <form class="estimate-form" id="estimate-form" action="/api/estimate" method="post" novalidate>
+          <div class="hp" aria-hidden="true"><label for="f-company">Company website</label><input id="f-company" name="company_website" tabindex="-1" autocomplete="off"></div>
           <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required></div>
           <div class="field-row">
             <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
