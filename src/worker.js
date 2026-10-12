@@ -15,13 +15,35 @@ const DEFAULT_FROM = "Apache Junction Epoxy <onboarding@resend.dev>";
 const LIMITS = { name: 100, phone: 40, email: 200, service: 80, city: 80, message: 3000, page: 200 };
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 
+/** Read a setting by name, ignoring case and stray spaces in the name or value. */
+function setting(env, name) {
+  const want = name.toLowerCase();
+  for (const [k, v] of Object.entries(env)) {
+    if (k.trim().toLowerCase() === want && typeof v === "string" && v.trim()) return v.trim();
+  }
+  return "";
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/api/estimate") return handleEstimate(request, env);
+    if (url.pathname === "/api/estimate/status") return status(env);
     return env.ASSETS.fetch(request);
   },
 };
+
+/** Setup check: says which settings the Worker can see, never their values. */
+function status(env) {
+  const key = setting(env, "RESEND_API_KEY"), to = setting(env, "LEADS_TO_EMAIL");
+  return json({
+    ready: Boolean(key && to),
+    RESEND_API_KEY: key ? (key.startsWith("re_") ? "found" : "found, but it doesn't start with re_") : "missing",
+    LEADS_TO_EMAIL: to ? (to.split(",").every((a) => EMAIL_RE.test(a.trim())) ? "found" : "found, but it isn't a valid email address") : "missing",
+    LEADS_FROM_EMAIL: setting(env, "LEADS_FROM_EMAIL") ? "found" : "not set (using Resend's test sender)",
+    settings_seen: Object.keys(env).filter((k) => k !== "ASSETS").sort(),
+  });
+}
 
 async function handleEstimate(request, env) {
   if (request.method !== "POST") {
@@ -53,14 +75,15 @@ async function handleEstimate(request, env) {
   if (!f.name || !f.phone) return reply(wantsJson, false, "Add your name and phone number so we can reach you.", 422);
   if (f.email && !EMAIL_RE.test(f.email)) return reply(wantsJson, false, "Check the email address, or leave it blank.", 422);
 
-  if (!env.RESEND_API_KEY || !env.LEADS_TO_EMAIL) {
-    console.error("Estimate form is missing RESEND_API_KEY or LEADS_TO_EMAIL.");
+  const apiKey = setting(env, "RESEND_API_KEY"), leadsTo = setting(env, "LEADS_TO_EMAIL");
+  if (!apiKey || !leadsTo) {
+    console.error("Estimate form setup incomplete:", { RESEND_API_KEY: Boolean(apiKey), LEADS_TO_EMAIL: Boolean(leadsTo), seen: Object.keys(env) });
     return reply(wantsJson, false, "The form isn't set up yet. Please call us instead.", 503);
   }
 
-  const to = env.LEADS_TO_EMAIL.split(",").map((s) => s.trim()).filter(Boolean);
+  const to = leadsTo.split(",").map((s) => s.trim()).filter(Boolean);
   const payload = {
-    from: env.LEADS_FROM_EMAIL || DEFAULT_FROM,
+    from: setting(env, "LEADS_FROM_EMAIL") || DEFAULT_FROM,
     to,
     subject: `New estimate request: ${f.service || "Floor coating"} – ${f.name}`,
     html: emailHtml(f),
@@ -72,7 +95,7 @@ async function handleEstimate(request, env) {
   try {
     res = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
   } catch (err) {
