@@ -415,6 +415,57 @@
     });
   }
 
+
+  /* ------------------------------------------------------------------
+   * Photo gallery lightbox
+   * ------------------------------------------------------------------ */
+  const gItems = Array.from(document.querySelectorAll(".g-item"));
+  if (gItems.length) {
+    const box = document.createElement("div");
+    box.className = "lightbox";
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", "Photo viewer");
+    box.innerHTML = '<span class="lb-count"></span><img alt=""><p class="lb-caption"></p>' +
+      '<button class="lb-btn lb-close" aria-label="Close photo">\u2715</button>' +
+      '<button class="lb-btn lb-prev" aria-label="Previous photo">\u2039</button>' +
+      '<button class="lb-btn lb-next" aria-label="Next photo">\u203a</button>';
+    document.body.appendChild(box);
+    const img = box.querySelector("img"), cap = box.querySelector(".lb-caption"), count = box.querySelector(".lb-count");
+    let cur = 0, opener = null;
+    const show = (i) => {
+      cur = (i + gItems.length) % gItems.length;
+      const a = gItems[cur], alt = a.querySelector("img").alt;
+      img.src = a.dataset.full || a.href; img.alt = alt; cap.textContent = alt;
+      count.textContent = (cur + 1) + " / " + gItems.length;
+    };
+    const open = (i) => { opener = document.activeElement; show(i); box.classList.add("open"); document.body.classList.add("lb-lock"); box.querySelector(".lb-close").focus(); };
+    const close = () => { box.classList.remove("open"); document.body.classList.remove("lb-lock"); if (opener) opener.focus(); };
+    gItems.forEach((a, i) => a.addEventListener("click", (e) => { e.preventDefault(); open(i); }));
+    box.querySelector(".lb-close").addEventListener("click", close);
+    box.querySelector(".lb-prev").addEventListener("click", () => show(cur - 1));
+    box.querySelector(".lb-next").addEventListener("click", () => show(cur + 1));
+    box.addEventListener("click", (e) => { if (e.target === box) close(); });
+    document.addEventListener("keydown", (e) => {
+      if (!box.classList.contains("open")) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") show(cur - 1);
+      else if (e.key === "ArrowRight") show(cur + 1);
+      else if (e.key === "Tab") { // keep focus inside the viewer
+        const f = Array.from(box.querySelectorAll("button")), first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+    let sx = null;
+    box.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
+    box.addEventListener("touchend", (e) => {
+      if (sx === null) return;
+      const dx = e.changedTouches[0].clientX - sx; sx = null;
+      if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1));
+    });
+  }
+
   const year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
 })();
