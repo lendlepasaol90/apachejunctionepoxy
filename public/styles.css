@@ -429,3 +429,19 @@ section[id] { scroll-margin-top: 88px; }
 .site-header.scrolled .logo-on-light, .site-header.menu-open .logo-on-light { opacity: 1; }
 .footer-logo { width: 220px; height: auto; margin-bottom: 16px; }
 @media (max-width: 760px) { .header-row { height: 76px; } .nav ul { top: 76px !important; } .brand .logo { height: 54px; } }
+
+/* =====================================================================
+   Photos
+   ===================================================================== */
+.photo { margin: 40px 0 0; }
+.photo img { display: block; width: 100%; height: auto; border-radius: 18px; background: var(--ice); }
+.photo-wide img { aspect-ratio: 21 / 9; object-fit: cover; }
+.intro .intro-photo { grid-column: 1 / -1; margin-top: 16px; }
+.intro-photo img { object-position: 50% 62%; }
+.process-photo img { object-position: 50% 55%; }
+.process .process-photo { margin-top: 32px; }
+@media (max-width: 760px) {
+  .photo { margin-top: 28px; }
+  .photo img { border-radius: 14px; }
+  .photo-wide img { aspect-ratio: 4 / 3; }
+}
