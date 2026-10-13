@@ -388,17 +388,21 @@
   /* ------------------------------------------------------------------
    * Estimate form: posts to /api/estimate (Cloudflare Worker -> Resend)
    * ------------------------------------------------------------------ */
-  const form = document.getElementById("estimate-form");
-  const status = document.getElementById("form-status");
-  if (form) {
+  const forms = Array.from(document.querySelectorAll("form.estimate-form"));
+  const PHONE_MSG = "We couldn't send your request. Call (480) 555-0142 or try again.";
+  const sayIn = (el, msg, isError) => { if (!el) return; el.className = "form-status" + (isError ? " error" : " success"); el.textContent = msg; };
+
+  // Result of a no-JavaScript submission (the Worker redirects back to #estimate)
+  const q = new URLSearchParams(location.search).get("estimate");
+  const redirectStatus = document.querySelector("[data-redirect-status]");
+  if (q === "sent") sayIn(redirectStatus, "Thanks. We got your request and will call you within one business day.", false);
+  else if (q === "error") sayIn(redirectStatus, PHONE_MSG, true);
+
+  forms.forEach((form) => {
+    const status = form.querySelector(".form-status");
     const btn = form.querySelector('button[type="submit"]');
     const btnLabel = btn ? btn.textContent : "";
-    const say = (msg, isError) => { status.className = "form-status" + (isError ? " error" : " success"); status.textContent = msg; };
-
-    // Result of a no-JavaScript submission (the Worker redirects back here)
-    const q = new URLSearchParams(location.search).get("estimate");
-    if (q === "sent") say("Thanks. We got your request and will call you within one business day.", false);
-    else if (q === "error") say("We couldn't send your request. Call (480) 555-0142 or try again.", true);
+    const say = (msg, isError) => sayIn(status, msg, isError);
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -410,16 +414,16 @@
         if (empty && !bad) bad = f;
       });
       if (bad) { say("Add your name and phone number so we can reach you.", true); bad.focus(); return; }
-      if (email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+      if (email && email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
         email.setAttribute("aria-invalid", "true"); say("Check the email address, or leave it blank.", true); email.focus(); return;
       }
-      email.setAttribute("aria-invalid", "false");
+      if (email) email.setAttribute("aria-invalid", "false");
 
       const data = Object.fromEntries(new FormData(form));
-      data.page = location.pathname;
+      data.page = location.pathname + (form.dataset.source ? " (" + form.dataset.source + ")" : "");
       btn.disabled = true; btn.textContent = "Sending…"; say("", false);
       try {
-        const res = await fetch(form.action, {
+        const res = await fetch(form.getAttribute("action"), {
           method: "POST",
           headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify(data),
@@ -430,12 +434,12 @@
         form.reset();
         say(`Thanks, ${first}. We got your request and will call you within one business day.`, false);
       } catch (err) {
-        say((err && err.message) || "We couldn't send your request. Call (480) 555-0142 or try again.", true);
+        say((err && err.message) || PHONE_MSG, true);
       } finally {
         btn.disabled = false; btn.textContent = btnLabel;
       }
     });
-  }
+  });
 
 
   /* ------------------------------------------------------------------

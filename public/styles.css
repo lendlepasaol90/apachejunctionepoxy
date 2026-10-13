@@ -551,3 +551,41 @@ body.lb-lock { overflow: hidden; }
 @media (max-width: 960px) {
   .sys-row p + p::before { content: "Keep in mind: "; font-weight: 700; color: var(--navy); }
 }
+
+/* =====================================================================
+   Hero estimate form
+   ===================================================================== */
+.hero-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 420px); gap: 48px; align-items: end; }
+.hero-split .hero-title { font-size: clamp(2.6rem, 5.6vw, 5rem); }
+.hero-form-card {
+  background: var(--white); color: var(--navy); border-radius: 20px; padding: 26px 26px 20px;
+  box-shadow: 0 30px 70px -30px rgba(2, 10, 30, .75);
+}
+.hero-form-title { font-size: var(--step-2); font-weight: 800; font-variation-settings: var(--wide); max-width: none; }
+.hero-form-sub { margin-top: 4px; color: var(--steel); font-size: .95rem; }
+.estimate-form.estimate-form-compact { background: none; box-shadow: none; padding: 0; border-radius: 0; gap: 12px; margin-top: 18px; }
+.estimate-form-compact .field { gap: 4px; }
+.estimate-form-compact .field label { font-size: .88rem; }
+.estimate-form-compact .field input, .estimate-form-compact .field select { min-height: 46px; padding: 10px 12px; }
+.estimate-form-compact .field-row { gap: 12px; }
+.estimate-form-compact .btn { width: 100%; margin-top: 4px; }
+.estimate-form-compact .form-status { font-size: .92rem; min-height: 0; }
+.estimate-form-compact .form-status:empty { display: none; }
+#quick-estimate { scroll-margin-top: 100px; }
+
+/* joins the hero's load sequence */
+.js .hero-form-card { opacity: 0; transform: translateY(28px); }
+.js.ready .hero-form-card { opacity: 1; transform: none; transition: opacity .9s var(--ease-out) .45s, transform 1.1s var(--ease-out) .45s; }
+
+@media (max-width: 960px) {
+  .hero { min-height: 0; }
+  .hero-split { grid-template-columns: 1fr; gap: 32px; align-items: start; padding-top: 112px; padding-bottom: 48px; }
+  .hero-note { display: none; }
+}
+@media (max-width: 760px) {
+  .hero-form-card { padding: 22px 18px 16px; border-radius: 16px; }
+  .estimate-form-compact .field-row { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .hero-form-card { opacity: 1; transform: none; }
+}
