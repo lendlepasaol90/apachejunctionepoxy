@@ -72,8 +72,8 @@ async function handleEstimate(request, env) {
   const f = {};
   for (const [k, max] of Object.entries(LIMITS)) f[k] = String(data[k] ?? "").trim().slice(0, max);
 
-  if (!f.name || !f.phone) return reply(wantsJson, false, "Add your name and phone number so we can reach you.", 422);
-  if (f.email && !EMAIL_RE.test(f.email)) return reply(wantsJson, false, "Check the email address, or leave it blank.", 422);
+  if (!f.name || !f.phone || !f.email) return reply(wantsJson, false, "Add your name, phone number and email so we can reach you.", 422);
+  if (!EMAIL_RE.test(f.email)) return reply(wantsJson, false, "Check the email address. It should look like name@example.com.", 422);
 
   const apiKey = setting(env, "RESEND_API_KEY"), leadsTo = setting(env, "LEADS_TO_EMAIL");
   if (!apiKey || !leadsTo) {
@@ -129,7 +129,7 @@ function rows(f) {
   return [
     ["Name", f.name],
     ["Phone", f.phone],
-    ["Email", f.email || "Not given"],
+    ["Email", f.email],
     ["Service", f.service || "Not given"],
     ["City", f.city || "Not given"],
     ["Sent from", f.page || "Website"],

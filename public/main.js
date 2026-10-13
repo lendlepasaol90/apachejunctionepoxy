@@ -408,16 +408,16 @@
       e.preventDefault();
       const name = form.elements.name, phone = form.elements.phone, email = form.elements.email;
       let bad = null;
-      [name, phone].forEach((f) => {
+      [name, phone, email].forEach((f) => {
         const empty = !f.value.trim();
         f.setAttribute("aria-invalid", String(empty));
         if (empty && !bad) bad = f;
       });
-      if (bad) { say("Add your name and phone number so we can reach you.", true); bad.focus(); return; }
-      if (email && email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-        email.setAttribute("aria-invalid", "true"); say("Check the email address, or leave it blank.", true); email.focus(); return;
+      if (bad) { say("Add your name, phone number and email so we can reach you.", true); bad.focus(); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+        email.setAttribute("aria-invalid", "true"); say("Check the email address. It should look like name@example.com.", true); email.focus(); return;
       }
-      if (email) email.setAttribute("aria-invalid", "false");
+      email.setAttribute("aria-invalid", "false");
 
       const data = Object.fromEntries(new FormData(form));
       data.page = location.pathname + (form.dataset.source ? " (" + form.dataset.source + ")" : "");
