@@ -595,3 +595,11 @@ body.lb-lock { overflow: hidden; }
 .hero-split .hero-title { max-width: 16ch; text-wrap: balance; }
 @media (max-width: 1100px) and (min-width: 961px) { .hero-split .hero-title { font-size: clamp(2.2rem, 4.2vw, 3.2rem); } }
 @media (max-width: 360px) { .hero-split .hero-title { font-size: 2rem; } }
+
+/* Tighter space under the fixed header on phones */
+@media (max-width: 760px) {
+  .hero-split { padding-top: 92px; }
+  .page-hero { min-height: 0; }
+  .page-hero-inner { padding-top: 92px; padding-bottom: 36px; }
+  .page-title { margin-top: 12px; }
+}
