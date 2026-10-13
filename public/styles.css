@@ -613,3 +613,8 @@ body.lb-lock { overflow: hidden; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-map iframe { height: 240px; }
 }
+
+/* Less space between "How an install goes" and "Why prep is most of the job" */
+.process { padding-bottom: clamp(40px, 6vw, 80px); }
+.process + .prep { padding-top: 0; }
+@media (max-width: 960px) { .process .steps li:last-child { padding-bottom: 0; } }
