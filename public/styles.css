@@ -589,3 +589,9 @@ body.lb-lock { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .js .hero-form-card { opacity: 1; transform: none; }
 }
+/* longer keyword H1 on the home page */
+.hero-split .hero-title { font-size: clamp(2.3rem, 4.6vw, 4.25rem); max-width: 14ch; line-height: 1.02; }
+@media (max-width: 960px) { .hero-split .hero-title { font-size: clamp(2.2rem, 8.4vw, 3.4rem); } }
+.hero-split .hero-title { max-width: 16ch; text-wrap: balance; }
+@media (max-width: 1100px) and (min-width: 961px) { .hero-split .hero-title { font-size: clamp(2.2rem, 4.2vw, 3.2rem); } }
+@media (max-width: 360px) { .hero-split .hero-title { font-size: 2rem; } }
