@@ -68,12 +68,32 @@
     <section class="page-hero" aria-labelledby="page-title">
       <canvas class="page-hero-finish" data-finish="warehouse" data-hero aria-hidden="true"></canvas>
       <div class="page-hero-shade" aria-hidden="true"></div>
-      <div class="wrap page-hero-inner">
-        <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/#services">Services</a></li><li aria-current="page">Warehouse Floor Coatings</li></ol></nav>
-        <h1 id="page-title" class="page-title">Warehouse Floor Coatings in Apache Junction, AZ</h1>
-        <div class="hero-actions">
-          <a class="btn btn-light" href="/#quick-estimate">Get a free estimate</a>
-          <a class="btn btn-ghost" href="tel:+14805550142">Call (480) 555-0142</a>
+      <div class="wrap page-hero-inner page-hero-split">
+        <div class="page-hero-copy">
+          <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/#services">Services</a></li><li aria-current="page">Warehouse Floor Coatings</li></ol></nav>
+          <h1 id="page-title" class="page-title">Warehouse Floor Coatings in Apache Junction, AZ</h1>
+          <div class="hero-actions">
+            <a class="btn btn-ghost" href="tel:+14805550142">Call (480) 555-0142</a>
+          </div>
+        </div>
+        <div class="hero-form-card" id="quick-estimate">
+          <h2 class="hero-form-title" id="quick-estimate-title">Get a free estimate</h2>
+          <p class="hero-form-sub">We'll call you within one business day.</p>
+          <form class="estimate-form estimate-form-compact" action="/api/estimate" method="post" novalidate aria-labelledby="quick-estimate-title" data-source="Warehouse Floor Coatings page, top form">
+            <div class="hp" aria-hidden="true"><label for="q-company">Company website</label><input id="q-company" name="company_website" tabindex="-1" autocomplete="off"></div>
+            <div class="field"><label for="q-name">Name</label><input id="q-name" name="name" autocomplete="name" required></div>
+            <div class="field-row">
+              <div class="field"><label for="q-phone">Phone</label><input id="q-phone" name="phone" type="tel" autocomplete="tel" required></div>
+              <div class="field"><label for="q-email">Email</label><input id="q-email" name="email" type="email" autocomplete="email" required></div>
+            </div>
+            <div class="field">
+              <label for="q-service">Service</label>
+              <select id="q-service" name="service"><option>Garage floor coating</option><option>Decorative flake</option><option>Metallic epoxy</option><option>Polyaspartic floor</option><option>Polyurea floor</option><option>Residential epoxy</option><option>Patio / concrete coating</option><option>Commercial epoxy</option><option selected>Warehouse / industrial</option><option>Concrete prep &amp; repair</option><option>Not sure yet</option></select>
+            </div>
+            <input type="hidden" name="city" value="">
+            <button class="btn btn-solid" type="submit">Get my free estimate</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </section>
@@ -150,7 +170,7 @@
         <div class="aside-card">
           <p class="aside-title">Free estimate</p>
           <p>We look at the slab before we quote, so the price matches the floor you actually have.</p>
-          <a class="btn btn-solid" href="/#quick-estimate">Request an estimate</a>
+          <a class="btn btn-solid" href="#quick-estimate">Request an estimate</a>
           <a class="aside-phone" href="tel:+14805550142">or call (480) 555-0142</a>
         </div>
         <nav class="toc" aria-label="On this page">
@@ -193,7 +213,7 @@
         <h2 id="cta-h">Ready to Discuss Your Flooring Project?</h2>
         <p>Contact Apache Junction Epoxy to discuss warehouse floor coatings for your property in Apache Junction, Arizona. Share the location, current concrete condition, intended use and finish preferences so the project can be evaluated with the right preparation and coating options in mind. Request an estimate and ask any questions about system selection, scheduling, cure time and ongoing care.</p>
         <div class="hero-actions">
-          <a class="btn btn-light" href="/#quick-estimate">Request an estimate</a>
+          <a class="btn btn-light" href="#quick-estimate">Request an estimate</a>
           <a class="btn btn-ghost" href="tel:+14805550142">Call (480) 555-0142</a>
         </div>
       </div>
@@ -225,7 +245,7 @@
       <div>
         <p class="footer-head">Get started</p>
         <ul class="footer-links">
-          <li><a href="/#quick-estimate">Request an estimate</a></li>
+          <li><a href="#quick-estimate">Request an estimate</a></li>
           <li><a href="/#process">How an install goes</a></li>
           <li><a href="/#area">Service Area</a></li>
         </ul>

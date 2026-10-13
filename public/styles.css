@@ -618,3 +618,11 @@ body.lb-lock { overflow: hidden; }
 .process { padding-bottom: clamp(40px, 6vw, 80px); }
 .process + .prep { padding-top: 0; }
 @media (max-width: 960px) { .process .steps li:last-child { padding-bottom: 0; } }
+
+/* Service pages: headline + estimate form side by side */
+.page-hero-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 420px); gap: 48px; align-items: end; }
+.page-hero-split .page-title { font-size: clamp(2.1rem, 4.4vw, 3.6rem); max-width: 18ch; text-wrap: balance; }
+@media (max-width: 960px) {
+  .page-hero-split { grid-template-columns: 1fr; gap: 28px; align-items: start; }
+  .page-hero-shade { background: linear-gradient(180deg, rgba(7,26,61,.7) 0%, rgba(7,26,61,.55) 45%, rgba(7,26,61,.85) 100%); }
+}
