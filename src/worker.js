@@ -27,6 +27,11 @@ function setting(env, name) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // One address for search engines: www.apachejunctionepoxy.com -> apachejunctionepoxy.com
+    if (url.hostname.startsWith("www.")) {
+      url.hostname = url.hostname.slice(4);
+      return Response.redirect(url.toString(), 301);
+    }
     if (url.pathname === "/api/estimate") return handleEstimate(request, env);
     if (url.pathname === "/api/estimate/status") return status(env);
     return env.ASSETS.fetch(request);
