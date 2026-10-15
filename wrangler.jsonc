@@ -13,7 +13,7 @@
   // Where estimate requests go and who they come from. To change them, edit here.
   "vars": {
     "LEADS_TO_EMAIL": "info@apachejunctionepoxy.com",
-    "LEADS_FROM_EMAIL": "Apache Junction Epoxy Flooring <estimates@apachejunctionepoxy.com>"
+    "LEADS_FROM_EMAIL": "Apache Junction Epoxy Flooring <info@apachejunctionepoxy.com>"
   },
   // Cloudflare Email Service sends the estimate emails (to a verified address on this account).
   "send_email": [{ "name": "EMAIL" }],

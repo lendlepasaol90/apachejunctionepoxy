@@ -7,10 +7,10 @@
  * Configuration (wrangler.jsonc):
  *   EMAIL            send_email binding (Cloudflare Email Service)
  *   LEADS_TO_EMAIL   where estimate requests go (a verified address on this account)
- *   LEADS_FROM_EMAIL sender, e.g. "Apache Junction Epoxy Flooring <estimates@apachejunctionepoxy.com>"
+ *   LEADS_FROM_EMAIL sender, e.g. "Apache Junction Epoxy Flooring <info@apachejunctionepoxy.com>"
  */
 
-const DEFAULT_FROM = "Apache Junction Epoxy Flooring <estimates@apachejunctionepoxy.com>";
+const DEFAULT_FROM = "Apache Junction Epoxy Flooring <info@apachejunctionepoxy.com>";
 const LIMITS = { name: 100, phone: 40, email: 200, service: 80, city: 80, message: 3000, page: 200 };
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 
