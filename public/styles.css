@@ -626,3 +626,5 @@ body.lb-lock { overflow: hidden; }
   .page-hero-split { grid-template-columns: 1fr; gap: 28px; align-items: start; }
   .page-hero-shade { background: linear-gradient(180deg, rgba(7,26,61,.7) 0%, rgba(7,26,61,.55) 45%, rgba(7,26,61,.85) 100%); }
 }
+.footer-address { font-style: normal; margin-top: 16px; line-height: 1.55; }
+.footer-address + .footer-contact { margin-top: 10px; }

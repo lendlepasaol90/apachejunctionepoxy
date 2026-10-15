@@ -1,5 +1,5 @@
 /**
- * Apache Junction Epoxy — Cloudflare Worker
+ * Apache Junction Epoxy Flooring — Cloudflare Worker
  *
  * Serves the static site from ./public and handles the estimate form at
  * POST /api/estimate, delivering each request by email through Resend.
@@ -7,11 +7,11 @@
  * Settings (Cloudflare dashboard → Worker → Settings → Variables and Secrets):
  *   RESEND_API_KEY  (secret, required)  Resend API key. Never commit it.
  *   LEADS_TO_EMAIL  (required)          Inbox(es) that receive requests; comma-separated.
- *   LEADS_FROM_EMAIL (optional)         Sender, e.g. "Apache Junction Epoxy <estimates@apachejunctionepoxy.com>".
+ *   LEADS_FROM_EMAIL (optional)         Sender, e.g. "Apache Junction Epoxy Flooring <estimates@apachejunctionepoxy.com>".
  *                                       Must be on a domain verified in Resend. Defaults to Resend's test sender.
  */
 
-const DEFAULT_FROM = "Apache Junction Epoxy <onboarding@resend.dev>";
+const DEFAULT_FROM = "Apache Junction Epoxy Flooring <onboarding@resend.dev>";
 const LIMITS = { name: 100, phone: 40, email: 200, service: 80, city: 80, message: 3000, page: 200 };
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 

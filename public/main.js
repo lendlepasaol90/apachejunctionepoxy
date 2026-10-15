@@ -389,7 +389,7 @@
    * Estimate form: posts to /api/estimate (Cloudflare Worker -> Resend)
    * ------------------------------------------------------------------ */
   const forms = Array.from(document.querySelectorAll("form.estimate-form"));
-  const PHONE_MSG = "We couldn't send your request. Call (480) 555-0142 or try again.";
+  const PHONE_MSG = "We couldn't send your request. Call (520) 593-5152 or try again.";
   const sayIn = (el, msg, isError) => { if (!el) return; el.className = "form-status" + (isError ? " error" : " success"); el.textContent = msg; };
 
   // Result of a no-JavaScript submission (the Worker redirects back to #estimate)
