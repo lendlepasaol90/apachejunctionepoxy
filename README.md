@@ -13,4 +13,4 @@ Every push to `main` redeploys automatically.
 ## Placeholders to replace
 - Phone `(520) 593-5152` and email `info@apachejunctionepoxy.com` (search `public/` for both)
 - Logo files live in `public/images/` (logo.webp for light backgrounds, logo-light.webp for dark ones, icon-*.png for browser tabs)
-- Estimate form: posts to `/api/estimate` (src/worker.js), which emails each request through Resend. Set RESEND_API_KEY (secret), LEADS_TO_EMAIL and optionally LEADS_FROM_EMAIL under the Worker's Settings → Variables and Secrets in Cloudflare.
+- Estimate form: posts to `/api/estimate` (src/worker.js), which emails each request through Resend. Recipient and sender are set under "vars" in wrangler.jsonc (currently info@apachejunctionepoxy.com, sent from estimates@apachejunctionepoxy.com). RESEND_API_KEY is a secret in the Cloudflare dashboard.
