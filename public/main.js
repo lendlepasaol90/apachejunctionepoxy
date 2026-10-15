@@ -386,7 +386,7 @@
   });
 
   /* ------------------------------------------------------------------
-   * Estimate form: posts to /api/estimate (Cloudflare Worker -> Resend)
+   * Estimate form: posts to /api/estimate (Cloudflare Worker -> Cloudflare Email)
    * ------------------------------------------------------------------ */
   const forms = Array.from(document.querySelectorAll("form.estimate-form"));
   const PHONE_MSG = "We couldn't send your request. Call (520) 593-5152 or try again.";

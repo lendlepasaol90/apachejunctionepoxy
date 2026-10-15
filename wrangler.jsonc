@@ -10,16 +10,14 @@
     // pages and files are then served from ./public.
     "run_worker_first": true
   },
-  // Where estimate requests go and who they come from. Both addresses are on the
-  // apachejunctionepoxy.com domain, which is verified in Resend. To change them, edit here.
+  // Where estimate requests go and who they come from. To change them, edit here.
   "vars": {
     "LEADS_TO_EMAIL": "info@apachejunctionepoxy.com",
     "LEADS_FROM_EMAIL": "Apache Junction Epoxy Flooring <estimates@apachejunctionepoxy.com>"
   },
   // Cloudflare Email Service sends the estimate emails (to a verified address on this account).
   "send_email": [{ "name": "EMAIL" }],
-  // RESEND_API_KEY is a secret set in the Cloudflare dashboard (never in this file); Resend is the backup sender.
-  // keep_vars stops a deploy from wiping dashboard-only settings.
+  // keep_vars stops a deploy from wiping settings added in the Cloudflare dashboard.
   "keep_vars": true,
   "observability": { "enabled": true }
 }
