@@ -13,4 +13,4 @@ Every push to `main` redeploys automatically.
 ## Placeholders to replace
 - Phone `(520) 593-5152` and email `info@apachejunctionepoxy.com` (search `public/` for both)
 - Logo files live in `public/images/` (logo.webp for light backgrounds, logo-light.webp for dark ones, icon-*.png for browser tabs)
-- Estimate form: posts to `/api/estimate` (src/worker.js), which emails each request with Cloudflare Email Service (the `EMAIL` send_email binding) to info@apachejunctionepoxy.com, from info@apachejunctionepoxy.com. Addresses are under "vars" in wrangler.jsonc. Check setup at /api/estimate/status.
+- Estimate form: posts to `/api/estimate` (src/worker.js), which emails each request with Cloudflare Email Service (the `EMAIL` send_email binding) from info@apachejunctionepoxy.com. The recipient is LEADS_TO_EMAIL, set in the Cloudflare dashboard (Settings > Variables and Secrets) and must be a verified Email Routing destination address. Check setup at /api/estimate/status.

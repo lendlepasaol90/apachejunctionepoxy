@@ -10,9 +10,10 @@
     // pages and files are then served from ./public.
     "run_worker_first": true
   },
-  // Where estimate requests go and who they come from. To change them, edit here.
+  // Sender of estimate emails. The recipient (LEADS_TO_EMAIL) is set privately in the
+  // Cloudflare dashboard (Settings > Variables and Secrets) so a personal inbox never
+  // appears in this public repo. It must be a verified Email Routing destination address.
   "vars": {
-    "LEADS_TO_EMAIL": "info@apachejunctionepoxy.com",
     "LEADS_FROM_EMAIL": "Apache Junction Epoxy Flooring <info@apachejunctionepoxy.com>"
   },
   // Cloudflare Email Service sends the estimate emails (to a verified address on this account).
