@@ -5,7 +5,8 @@
  * POST /api/estimate, delivering each request by email through Resend.
  *
  * Settings (Cloudflare dashboard → Worker → Settings → Variables and Secrets):
- *   RESEND_API_KEY  (secret, required)  Resend API key. Never commit it.
+ *   EMAIL           (binding)           Cloudflare Email Service; tried first.
+ *   RESEND_API_KEY  (secret, optional)  Resend API key, used as a backup. Never commit it.
  *   LEADS_TO_EMAIL  (required)          Inbox(es) that receive requests; comma-separated.
  *   LEADS_FROM_EMAIL (optional)         Sender, e.g. "Apache Junction Epoxy Flooring <estimates@apachejunctionepoxy.com>".
  *                                       Must be on a domain verified in Resend. Defaults to Resend's test sender.
@@ -41,13 +42,42 @@ export default {
 /** Setup check: says which settings the Worker can see, never their values. */
 function status(env) {
   const key = setting(env, "RESEND_API_KEY"), to = setting(env, "LEADS_TO_EMAIL");
+  const cf = Boolean(env.EMAIL && typeof env.EMAIL.send === "function");
   return json({
-    ready: Boolean(key && to),
+    ready: Boolean(to && (cf || key)),
+    sends_with: cf ? (key ? "Cloudflare Email (Resend as backup)" : "Cloudflare Email") : (key ? "Resend" : "nothing set up"),
+    CLOUDFLARE_EMAIL: cf ? "connected" : "missing",
     RESEND_API_KEY: key ? (key.startsWith("re_") ? "found" : "found, but it doesn't start with re_") : "missing",
     LEADS_TO_EMAIL: to ? (to.split(",").every((a) => EMAIL_RE.test(a.trim())) ? "found" : "found, but it isn't a valid email address") : "missing",
-    LEADS_FROM_EMAIL: setting(env, "LEADS_FROM_EMAIL") ? "found" : "not set (using Resend's test sender)",
+    LEADS_FROM_EMAIL: setting(env, "LEADS_FROM_EMAIL") ? "found" : "not set (using a default sender)",
     settings_seen: Object.keys(env).filter((k) => k !== "ASSETS").sort(),
   });
+}
+
+/** "Name <addr@x.com>" -> { name, email } */
+function parseAddress(s) {
+  const m = /^\s*(.*?)\s*<([^>]+)>\s*$/.exec(s);
+  return m ? { name: m[1].replace(/^"|"$/g, ""), email: m[2].trim() } : { email: s.trim() };
+}
+
+async function sendWithCloudflare(env, msg) {
+  await env.EMAIL.send({
+    to: msg.to,
+    from: parseAddress(msg.from),
+    replyTo: msg.replyTo,
+    subject: msg.subject,
+    html: msg.html,
+    text: msg.text,
+  });
+}
+
+async function sendWithResend(apiKey, msg) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: msg.from, to: msg.to, reply_to: msg.replyTo, subject: msg.subject, html: msg.html, text: msg.text }),
+  });
+  if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
 }
 
 async function handleEstimate(request, env) {
@@ -81,37 +111,41 @@ async function handleEstimate(request, env) {
   if (!EMAIL_RE.test(f.email)) return reply(wantsJson, false, "Check the email address. It should look like name@example.com.", 422);
 
   const apiKey = setting(env, "RESEND_API_KEY"), leadsTo = setting(env, "LEADS_TO_EMAIL");
-  if (!apiKey || !leadsTo) {
-    console.error("Estimate form setup incomplete:", { RESEND_API_KEY: Boolean(apiKey), LEADS_TO_EMAIL: Boolean(leadsTo), seen: Object.keys(env) });
+  const hasCloudflare = Boolean(env.EMAIL && typeof env.EMAIL.send === "function");
+  if (!leadsTo || (!hasCloudflare && !apiKey)) {
+    console.error("Estimate form setup incomplete:", { CLOUDFLARE_EMAIL: hasCloudflare, RESEND_API_KEY: Boolean(apiKey), LEADS_TO_EMAIL: Boolean(leadsTo) });
     return reply(wantsJson, false, "The form isn't set up yet. Please call us instead.", 503);
   }
 
-  const to = leadsTo.split(",").map((s) => s.trim()).filter(Boolean);
-  const payload = {
+  const msg = {
     from: setting(env, "LEADS_FROM_EMAIL") || DEFAULT_FROM,
-    to,
+    to: leadsTo.split(",").map((s) => s.trim()).filter(Boolean),
+    replyTo: f.email,
     subject: `New estimate request: ${f.service || "Floor coating"} – ${f.name}`,
     html: emailHtml(f),
     text: emailText(f),
   };
-  if (f.email) payload.reply_to = f.email;
 
-  let res;
-  try {
-    res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-  } catch (err) {
-    console.error("Resend request failed:", err);
-    return reply(wantsJson, false, "We couldn't send your request. Please call us or try again.", 502);
+  // 1) Cloudflare Email Service  2) Resend as a backup, so a lead is never lost.
+  if (hasCloudflare) {
+    try {
+      await sendWithCloudflare(env, msg);
+      console.log("Estimate request sent with Cloudflare Email");
+      return reply(wantsJson, true, "", 200);
+    } catch (err) {
+      console.error("Cloudflare Email failed:", err && (err.code || ""), err && err.message);
+    }
   }
-  if (!res.ok) {
-    console.error("Resend error", res.status, await res.text());
-    return reply(wantsJson, false, "We couldn't send your request. Please call us or try again.", 502);
+  if (apiKey) {
+    try {
+      await sendWithResend(apiKey, msg);
+      console.log("Estimate request sent with Resend" + (hasCloudflare ? " (backup)" : ""));
+      return reply(wantsJson, true, "", 200);
+    } catch (err) {
+      console.error("Resend failed:", err && err.message);
+    }
   }
-  return reply(wantsJson, true, "", 200);
+  return reply(wantsJson, false, "We couldn't send your request. Please call us or try again.", 502);
 }
 
 function reply(wantsJson, ok, error, status) {
